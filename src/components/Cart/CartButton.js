@@ -5,9 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 const CartButton = (props) => {
 
   const dispatch = useDispatch();
-  const cartData = useSelector(state => state.cartData);
+  const cartData = useSelector(state => state.totalQuantitiy);
 
-  const cartSize = cartData.length;
 
   const cartClickHandler = () => {
     dispatch(cartActions.showCart())
@@ -16,7 +15,7 @@ const CartButton = (props) => {
   return (
     <button className={classes.button} onClick={cartClickHandler}>
       <span>My Cart</span>
-      <span className={classes.badge}>{cartSize}</span>
+      <span className={classes.badge}>{cartData}</span>
     </button>
   );
 };

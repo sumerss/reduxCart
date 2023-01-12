@@ -8,13 +8,16 @@ const Cart = (props) => {
 
   const cartData = useSelector(state => state.cartData);
 
+  // console.log(cartData)
+
   return (
     <Card className={classes.cart}>
       <h2>Your Shopping Cart</h2>
       <ul>
         {cartData.map(data => {
           return <CartItem
-            item={{ title: data.title, quantity: data.quantity, total: data.total, price: data.price }}
+            key={data.id}
+            item={{ key: data.id, id: data.id, title: data.title, quantity: data.quantity, total: data.totalAmt, price: data.price }}
           />
         })}
       </ul>
