@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 
 const Cart = (props) => {
 
-  const cartData = useSelector(state => state.cartData);
+  const cartData = useSelector(state => state.cart.cartData);
 
   // console.log(cartData)
 
