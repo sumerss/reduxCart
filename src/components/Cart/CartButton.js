@@ -1,5 +1,5 @@
 import classes from './CartButton.module.css';
-import { cartActions } from '../../reduxStore/cart';
+import { uiActions } from '../../reduxStore/ui';
 import { useDispatch, useSelector } from 'react-redux';
 
 const CartButton = (props) => {
@@ -9,7 +9,12 @@ const CartButton = (props) => {
 
 
   const cartClickHandler = () => {
-    dispatch(cartActions.showCart())
+    dispatch(uiActions.showCart());
+    dispatch(uiActions.setNotification({
+      status: '',
+      title: '',
+      message: ''
+    }))
   };
 
   return (

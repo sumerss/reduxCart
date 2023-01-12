@@ -6,6 +6,7 @@ import Layout from './components/Layout/Layout';
 import Products from './components/Shop/Products';
 import Notification from './components/UI/Notifications';
 
+import { cartActions } from './reduxStore/cart';
 import { uiActions } from './reduxStore/ui';
 
 let initialPageLoad = true;
@@ -13,6 +14,7 @@ let initialPageLoad = true;
 function App() {
 
   const cart = useSelector(state => state.cart);
+  const ui = useSelector(state => state.ui);
   const notification = useSelector(state => state.ui.notifications);
   // console.log(notification)
   const dispatch = useDispatch();
@@ -26,7 +28,7 @@ function App() {
         title: 'Pending',
         message: 'Sending data...'
       }))
-      const res = await fetch('https://react-http-b29cd-default-rtdb.firebaseio.com/cart.jsn', {
+      const res = await fetch('https://react-http-b29cd-default-rtdb.firebaseio.com/cart.json', {
         method: 'PUT',
         body: JSON.stringify(data)
       });
@@ -54,7 +56,42 @@ function App() {
       }))
     })
 
-  }, [cart, dispatch])
+  }, [cart, dispatch]);
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+
+      const res = await fetch('https://react-http-b29cd-default-rtdb.firebaseio.com/cart.json');
+
+      if (!res.ok) {
+        throw new Error('Error while fetching');
+      }
+
+      const resData = await res.json();
+
+      const cartData = [];
+
+      Object.keys(resData.cartData).forEach((key) => {
+        cartData.push({
+          id: resData.cartData[key].id,
+          price: resData.cartData[key].price,
+          quantity: resData.cartData[key].quantity,
+          title: resData.cartData[key].title,
+          totalAmt: resData.cartData[key].totalAmt
+        })
+      })
+
+      dispatch(cartActions.createCart({
+        totalQuantitiy: resData.totalQuantitiy,
+        cartData
+      }))
+
+    };
+
+    fetchData();
+    initialPageLoad = true;
+  }, [])
 
   return (
     <Fragment>
@@ -65,7 +102,7 @@ function App() {
           message={notification.message}
         />}
       <Layout>
-        {cart.showCart && <Cart />}
+        {ui.showCart && <Cart />}
         <Products />
       </Layout>
     </Fragment>

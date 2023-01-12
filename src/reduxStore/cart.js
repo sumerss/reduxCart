@@ -9,9 +9,6 @@ const cartSlicer = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        showCart(state) {
-            state.showCart = !state.showCart;
-        },
         addCart(state, action) {
             const item = action.payload;
             const itemID = item.id;
@@ -45,6 +42,10 @@ const cartSlicer = createSlice({
             } else {
                 state.cartData.splice(presentIdx, 1)
             }
+        },
+        createCart(state, action) {
+            state.totalQuantitiy = action.payload.totalQuantitiy;
+            state.cartData = action.payload.cartData;
         }
     }
 });
