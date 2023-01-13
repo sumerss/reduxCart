@@ -44,8 +44,13 @@ const cartSlicer = createSlice({
             }
         },
         createCart(state, action) {
+            // console.log(action.payload)
             state.totalQuantitiy = action.payload.totalQuantitiy;
             state.cartData = action.payload.cartData;
+        },
+        clearCart(state) {
+            state.totalQuantitiy = 0;
+            state.cartData = [];
         }
     }
 });

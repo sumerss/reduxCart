@@ -9,7 +9,7 @@ import Notification from './components/UI/Notifications';
 import { cartActions } from './reduxStore/cart';
 import { uiActions } from './reduxStore/ui';
 
-let initialPageLoad = true;
+let afterFirstGet = true, firstGet = true;
 
 function App() {
 
@@ -42,9 +42,15 @@ function App() {
         message: 'Data sent successfully'
       }))
     }
-
-    if (initialPageLoad) {
-      initialPageLoad = false;
+    // if loaded first time
+    if (firstGet) {
+      // console.log('return 1');
+      return;
+    }
+    // if loaded after firstFetch
+    if (afterFirstGet) {
+      // console.log('return 2');
+      afterFirstGet = false;
       return;
     }
 
@@ -52,14 +58,17 @@ function App() {
       dispatch(uiActions.setNotification({
         status: 'error',
         title: 'Error',
-        message: 'Sending data failed!'
+        message: error.message
       }))
     })
-
   }, [cart, dispatch]);
 
   useEffect(() => {
-
+    dispatch(uiActions.setNotification({
+      status: 'pending',
+      title: 'Pending',
+      message: 'Fetching data...'
+    }))
     const fetchData = async () => {
 
       const res = await fetch('https://react-http-b29cd-default-rtdb.firebaseio.com/cart.json');
@@ -69,28 +78,37 @@ function App() {
       }
 
       const resData = await res.json();
+      // console.log(resData)
+      if (resData === null || resData.cartData === undefined) {
+        dispatch(uiActions.setNotification({
+          status: 'success',
+          title: 'Success',
+          message: 'No data available!'
+        }));
+        firstGet = false;
+        afterFirstGet = false;
+        return;
+      }
 
-      const cartData = [];
+      dispatch(cartActions.createCart(resData))
 
-      Object.keys(resData.cartData).forEach((key) => {
-        cartData.push({
-          id: resData.cartData[key].id,
-          price: resData.cartData[key].price,
-          quantity: resData.cartData[key].quantity,
-          title: resData.cartData[key].title,
-          totalAmt: resData.cartData[key].totalAmt
-        })
-      })
-
-      dispatch(cartActions.createCart({
-        totalQuantitiy: resData.totalQuantitiy,
-        cartData
-      }))
+      dispatch(uiActions.setNotification({
+        status: 'success',
+        title: 'Success',
+        message: 'Fetched data successfully!'
+      }));
 
     };
 
-    fetchData();
-    initialPageLoad = true;
+    fetchData().catch(error => {
+      dispatch(uiActions.setNotification({
+        status: 'error',
+        title: 'Error',
+        message: error.message
+      }));
+    });
+    firstGet = false;
+    // afterFirstGet = true;
   }, [])
 
   return (

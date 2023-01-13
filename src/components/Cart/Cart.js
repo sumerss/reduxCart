@@ -2,13 +2,38 @@ import Card from '../UI/Card';
 import classes from './Cart.module.css';
 import CartItem from './CartItem';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { uiActions } from '../../reduxStore/ui';
+import { cartActions } from '../../reduxStore/cart';
 
 const Cart = (props) => {
 
   const cartData = useSelector(state => state.cart.cartData);
+  const dispatch = useDispatch();
+  const cartLength = useSelector(state => state.cart.totalQuantitiy);
 
   // console.log(cartData)
+  const deleteHandler = async () => {
+    dispatch(uiActions.setNotification({
+      status: 'pending',
+      title: 'Pending',
+      message: 'Deleting data...'
+    }))
+
+    const res = await fetch('https://react-http-b29cd-default-rtdb.firebaseio.com/cart.json', {
+      method: 'DELETE'
+    });
+
+    // console.log(res);
+    dispatch(uiActions.setNotification({
+      status: 'success',
+      title: 'Success',
+      message: 'Deleted data'
+    }))
+
+    dispatch(cartActions.clearCart());
+
+  }
 
   return (
     <Card className={classes.cart}>
@@ -21,6 +46,11 @@ const Cart = (props) => {
           />
         })}
       </ul>
+      {cartLength > 0 &&
+        <div className={classes.buttonLayout}>
+          <button className={classes.button} onClick={deleteHandler}>Delete Cart</button>
+          <button disabled='true'>Order Cart</button>
+        </div>}
     </Card>
   );
 };
